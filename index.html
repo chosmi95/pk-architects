@@ -138,7 +138,7 @@
   }
   .hero-image.visible{opacity:1;}
   .hero .tagline{
-    margin-top:1.6rem;
+    margin-bottom:1.6rem;
     font-family:'Space Grotesk',sans-serif;
     font-size:1.05rem;
     color:var(--blueprint);
@@ -238,12 +238,9 @@
 
   /* ---------- Bio ---------- */
   .bio-wrap{
-    display:grid;
-    grid-template-columns:1fr 1.2fr;
-    gap:3.5rem;
-    align-items:start;
+    display:block;
   }
-  .bio-wrap h1{font-size:clamp(1.8rem,3vw,2.4rem); margin-bottom:1.4rem;}
+  .bio-wrap h1{font-size:clamp(1.8rem,3vw,2.4rem); margin-bottom:2.6rem;}
   .bio-copy p{color:var(--ink-soft); line-height:1.7; margin-bottom:1.1rem; max-width:60ch;}
   .bio-copy p:first-child{color:var(--ink); font-size:1.05rem;}
   .bio-panel{
@@ -448,17 +445,17 @@
     <!-- HOME -->
     <section data-route="home">
       <div class="hero">
+        <p class="tagline">Architectural practice based in Athens since 1983</p>
         <div class="hero-image-wrap">
           <img id="heroImage" class="hero-image" src="" alt="">
         </div>
-        <p class="tagline">Architectural practice based in Athens since 1983</p>
       </div>
     </section>
 
     <!-- PROJECTS -->
     <section data-route="projects">
       <div class="grid-head">
-        <h1>Έργα</h1>
+        <h1>Projects</h1>
         <span class="grid-count" id="projCount"></span>
       </div>
       <div class="project-grid" id="projectGrid"></div>
@@ -485,15 +482,6 @@
           <p>Το αρχιτεκτονικό γραφείο πk ιδρύθηκε στην Αθήνα το 1983 από τον Γιώργο Παπαγεωργίου και την Λουκία Καρόρη. Μέσα από σαράντα χρόνια πορείας έχει σχεδιάσει κατοικίες, καταστήματα και γραφεία, με έμφαση στο υλικό, το φως και την κλίμακα του χώρου.</p>
           <p>Σήμερα η ομάδα αποτελείται από 3 αρχιτέκτονες και συνεχίζει να δουλεύει με τις ίδιες βασικές αρχές.</p>
         </div>
-        <aside class="bio-panel">
-          <h3>Στοιχεία γραφείου</h3>
-          <ul>
-            <li><span>Έδρα</span><span>Αθήνα</span></li>
-            <li><span>Ίδρυση</span><span>1983</span></li>
-            <li><span>Ομάδα</span><span>3 αρχιτέκτονες</span></li>
-            <li><span>Ειδίκευση</span><span>Κατοικίες, Καταστήματα, Γραφεία</span></li>
-          </ul>
-        </aside>
       </div>
 
       <div class="team-section">
@@ -609,12 +597,14 @@
     grid.appendChild(card);
   });
 
-  for (var i = PROJECTS.length; i < TOTAL_SLOTS; i++){
-    var slot = document.createElement("div");
-    slot.className = "empty-slot";
-    slot.textContent = "Επόμενο έργο";
-    grid.appendChild(slot);
-  }
+  // Οι κενές θέσεις "Επόμενο έργο" αφαιρέθηκαν — το grid δείχνει μόνο
+  // τα πραγματικά projects. Αν θες να τις ξαναβάλεις, βγάλε το σχόλιο εδώ:
+  // for (var i = PROJECTS.length; i < TOTAL_SLOTS; i++){
+  //   var slot = document.createElement("div");
+  //   slot.className = "empty-slot";
+  //   slot.textContent = "Επόμενο έργο";
+  //   grid.appendChild(slot);
+  // }
 
   // ---- render team --------------------------------------------------------
   var teamGrid = document.getElementById("teamGrid");
