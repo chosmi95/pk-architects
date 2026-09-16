@@ -500,6 +500,18 @@
     });
   }
 
+  // ---- mobile nav toggle ----------------------------------------------------
+  var toggle = document.getElementById("menuToggle");
+  var nav = document.getElementById("mainNav");
+  function closeMobileNav(){
+    nav.classList.remove("open");
+    toggle.setAttribute("aria-expanded","false");
+  }
+  toggle.addEventListener("click", function(){
+    var open = nav.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
   // ---- routing -------------------------------------------------------------
   var routes = document.querySelectorAll("[data-route]");
   var navLinks = document.querySelectorAll(".main-nav a");
@@ -547,17 +559,6 @@
   window.addEventListener("hashchange", router);
   router();
 
-  // ---- mobile nav toggle ----------------------------------------------------
-  var toggle = document.getElementById("menuToggle");
-  var nav = document.getElementById("mainNav");
-  function closeMobileNav(){
-    nav.classList.remove("open");
-    toggle.setAttribute("aria-expanded","false");
-  }
-  toggle.addEventListener("click", function(){
-    var open = nav.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
 })();
 </script>
 </body>
