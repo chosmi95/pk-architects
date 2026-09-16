@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="el" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
+    color-scheme:light;
     --paper:#FAFAF8;
     --ink:#16181A;
     --ink-soft:#6B6F73;
@@ -16,24 +17,6 @@
     --blueprint:#2C4A6E;
     --blueprint-tint:#EDF1F5;
     --sidebar-w:248px;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --paper:#121316;
-      --ink:#F1F0EC;
-      --ink-soft:#9A9D9F;
-      --line:#2B2D31;
-      --blueprint:#8FB2DE;
-      --blueprint-tint:#1C2733;
-    }
-  }
-  :root[data-theme="dark"]{
-    --paper:#121316;
-    --ink:#F1F0EC;
-    --ink-soft:#9A9D9F;
-    --line:#2B2D31;
-    --blueprint:#8FB2DE;
-    --blueprint-tint:#1C2733;
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -78,8 +61,6 @@
   }
   .logo-link{display:inline-block; margin-bottom:3.2rem;}
   .logo-link img{width:150px; height:auto;}
-
-  html[data-theme_mode="dark-logo"]{}
 
   .main-nav{display:flex; flex-direction:column; gap:0.15rem; margin-bottom:auto;}
   .main-nav a{
