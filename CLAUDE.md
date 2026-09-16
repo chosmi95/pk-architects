@@ -71,7 +71,13 @@ Two headless traps worth knowing:
   read `document.documentElement.clientWidth` before concluding anything about
   layout at a given width.
 
-## Content still pending
+## Notes
 
-Team photos: `TEAM` entries carry `photo: null`, which renders a placeholder
-tile. Swap in a `data:image/...` string per person when the owner supplies them.
+Team photos were dropped: the team cards are name + role only, and neither the
+`.team-photo` styles nor the `photo` field survive. A stale comment above `TEAM`
+still invites a `photo:` value — wiring one up again means restoring the tile
+markup and CSS too.
+
+Size: every image is inlined, so the page is already ~1.8MB and grows with each
+project. If load time on mobile becomes a complaint, move the photos out to real
+files in the repo rather than trimming the page.
