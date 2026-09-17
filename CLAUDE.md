@@ -73,10 +73,10 @@ Two headless traps worth knowing:
 
 ## Notes
 
-Team photos were dropped: the team cards are name + role only, and neither the
-`.team-photo` styles nor the `photo` field survive. A stale comment above `TEAM`
-still invites a `photo:` value — wiring one up again means restoring the tile
-markup and CSS too.
+Team photos were dropped: the cards render name + role only. `TEAM` entries still
+carry `photo: null` and a comment inviting a data URI, but nothing reads the
+field and the `.team-photo` styles are gone — wiring photos back up means
+restoring the tile markup and CSS too, not just filling in the value.
 
 Size: every image is inlined, so the page is already ~1.8MB and grows with each
 project. If load time on mobile becomes a complaint, move the photos out to real
