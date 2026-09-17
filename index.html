@@ -16,11 +16,11 @@
     --line:#DEDBD3;
     --blueprint:#2C4A6E;
     --blueprint-tint:#EDF1F5;
-    --sidebar-w:248px;
+    --sidebar-w:15.5rem;
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
-  html{-webkit-font-smoothing:antialiased;}
+  html{-webkit-font-smoothing:antialiased; font-size:125%;}
   body{
     background:var(--paper);
     color:var(--ink);
@@ -60,7 +60,7 @@
     border-right:1px solid var(--line);
   }
   .logo-link{display:inline-block; margin-bottom:3.2rem;}
-  .logo-link img{width:150px; height:auto;}
+  .logo-link img{width:9.4rem; height:auto;}
 
   .main-nav{display:flex; flex-direction:column; gap:0.15rem;}
   .main-nav a{
@@ -157,14 +157,14 @@
   }
   .hero-stage:hover .hero-nav{opacity:0.9;}
   .hero-nav:hover{background:rgba(255,255,255,0.9); opacity:1;}
-  .hero-prev{left:1.6rem;}
-  .hero-next{left:4.4rem;}
+  .hero-prev{left:50%; transform:translateX(-52px);}
+  .hero-next{left:50%; transform:translateX(14px);}
   @media (max-width:920px){
     .hero{margin:0 -1.3rem -4rem;}
     .hero-image-wrap{height:62vh;}
     .hero-nav{opacity:0.85; bottom:1rem;}
-    .hero-prev{left:1rem;}
-    .hero-next{left:3.6rem;}
+    .hero-prev{left:50%; transform:translateX(-48px);}
+    .hero-next{left:50%; transform:translateX(10px);}
   }
 
   .project-grid{
@@ -281,8 +281,28 @@
     transition:background .25s ease;
   }
   .lightbox-close:hover{background:rgba(255,255,255,0.25);}
+  .lightbox-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:46px; height:46px;
+    display:flex; align-items:center; justify-content:center;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    color:#fff;
+    cursor:pointer;
+    transition:background .25s ease;
+    z-index:2;
+  }
+  .lightbox-nav:hover{background:rgba(255,255,255,0.25);}
+  .lightbox-prev{left:1.4rem;}
+  .lightbox-next{right:1.4rem;}
   @media (max-width:920px){
     .lightbox{padding:1.5rem 1rem;}
+    .lightbox-nav{width:40px; height:40px;}
+    .lightbox-prev{left:0.6rem;}
+    .lightbox-next{right:0.6rem;}
   }
 
   .back-link{
@@ -526,7 +546,13 @@
   <button class="lightbox-close" id="lightboxClose" aria-label="Κλείσιμο">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6l12 12M18 6L6 18"/></svg>
   </button>
+  <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Προηγούμενη φωτογραφία">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
   <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Επόμενη φωτογραφία">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
 </div>
 
 <script>
@@ -687,12 +713,12 @@
       "<dt>Κατάσταση</dt><dd>" + p.status + "</dd>";
     var gal = document.getElementById("pGallery");
     gal.innerHTML = "";
-    p.gallery.forEach(function(src){
+    p.gallery.forEach(function(src, i){
       var img = document.createElement("img");
       img.src = src;
       img.alt = p.title;
       img.className = "gallery-img";
-      img.addEventListener("click", function(){ openLightbox(src, p.title); });
+      img.addEventListener("click", function(){ openLightbox(p.gallery, i, p.title); });
       gal.appendChild(img);
     });
   }
@@ -701,10 +727,26 @@
   var lightbox = document.getElementById("lightbox");
   var lightboxImg = document.getElementById("lightboxImg");
   var lightboxClose = document.getElementById("lightboxClose");
+  var lightboxPrev = document.getElementById("lightboxPrev");
+  var lightboxNext = document.getElementById("lightboxNext");
 
-  function openLightbox(src, alt){
-    lightboxImg.src = src;
-    lightboxImg.alt = alt || "";
+  var lbGallery = [];   // οι φωτογραφίες του τρέχοντος project
+  var lbIndex = 0;
+  var lbTitle = "";
+
+  function renderLightbox(){
+    lightboxImg.src = lbGallery[lbIndex];
+    lightboxImg.alt = lbTitle;
+    var multi = lbGallery.length > 1;
+    lightboxPrev.style.display = multi ? "flex" : "none";
+    lightboxNext.style.display = multi ? "flex" : "none";
+  }
+
+  function openLightbox(gallery, index, title){
+    lbGallery = gallery;
+    lbIndex = index;
+    lbTitle = title || "";
+    renderLightbox();
     lightbox.classList.add("open");
     document.body.style.overflow = "hidden";
   }
@@ -713,13 +755,23 @@
     lightboxImg.src = "";
     document.body.style.overflow = "";
   }
+  function lbStep(delta){
+    if (lbGallery.length < 2) return;
+    lbIndex = (lbIndex + delta + lbGallery.length) % lbGallery.length;
+    renderLightbox();
+  }
 
   lightboxClose.addEventListener("click", closeLightbox);
+  lightboxPrev.addEventListener("click", function(e){ e.stopPropagation(); lbStep(-1); });
+  lightboxNext.addEventListener("click", function(e){ e.stopPropagation(); lbStep(1); });
   lightbox.addEventListener("click", function(e){
     if (e.target === lightbox) closeLightbox(); // κλικ έξω από την εικόνα
   });
   document.addEventListener("keydown", function(e){
-    if (e.key === "Escape" && lightbox.classList.contains("open")) closeLightbox();
+    if (!lightbox.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    else if (e.key === "ArrowLeft") lbStep(-1);
+    else if (e.key === "ArrowRight") lbStep(1);
   });
 
   // ---- mobile nav toggle ----------------------------------------------------
