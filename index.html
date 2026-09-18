@@ -113,6 +113,30 @@
     color:var(--ink-soft);
     line-height:1.6;
   }
+  .lang-switch{
+    margin-top:0.7rem;
+    display:flex;
+    align-items:center;
+    gap:0.3rem;
+  }
+  .lang-switch button{
+    background:none;
+    border:none;
+    padding:0;
+    font-family:'Inter',sans-serif;
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    color:var(--ink-soft);
+    opacity:0.55;
+    cursor:pointer;
+    transition:opacity .2s ease, color .2s ease;
+  }
+  .lang-switch button:hover{opacity:1; color:var(--ink);}
+  .lang-switch button.active{opacity:1; color:var(--ink);}
+  .lang-sep{font-size:0.72rem; color:var(--ink-soft); opacity:0.4;}
+  @media (max-width:920px){
+    .lang-switch{margin-top:0.5rem;}
+  }
 
   .menu-toggle{display:none;}
 
@@ -443,7 +467,13 @@
     }
     .main-nav.open{opacity:1; transform:translateY(0); pointer-events:auto;}
     .main-nav a{font-size:1.2rem; padding:0.9rem 0; border-bottom:1px solid var(--line); width:100%;}
-    .sidebar-foot{display:none;}
+    .sidebar-foot{
+      display:flex; align-items:center;
+      margin:0; order:2;
+    }
+    .sidebar-tagline{display:none;}   /* το tagline μένει μόνο σε desktop */
+    .logo-link{order:1;}
+    .menu-toggle{order:3;}
     .menu-toggle{
       display:inline-flex;
       flex-direction:column;
@@ -483,7 +513,10 @@
     </nav>
 
     <div class="sidebar-foot">
-      Architectural practice based in Athens since 1983
+      <span class="sidebar-tagline">Architectural practice based in Athens since 1983</span>
+      <div class="lang-switch">
+        <button type="button" data-lang="el">EL</button><span class="lang-sep">·</span><button type="button" data-lang="en">EN</button>
+      </div>
     </div>
   </aside>
 
@@ -517,7 +550,7 @@
 
     <!-- PROJECT DETAIL -->
     <section data-route="project">
-      <a href="#/projects" class="back-link">&larr; Όλα τα έργα</a>
+      <a href="#/projects" class="back-link" data-i18n="backToAll">&larr; Όλα τα έργα</a>
       <div class="proj-head">
         <div>
           <h1 id="pTitle"></h1>
@@ -533,13 +566,13 @@
       <div class="bio-wrap">
         <div class="bio-copy">
           <h1>About us</h1>
-          <p>Το αρχιτεκτονικό γραφείο πκ ιδρύθηκε το 1983 από τον Γιώργο Παπαγεωργίου και τη Λουκία Καρόρη. Ασχολείται με ιδιωτικά έργα — κατοικίες, καταστήματα, γραφεία, ξενώνες — αναλαμβάνοντας τη μελέτη, την επίβλεψη και την κατασκευή.</p>
-          <p>Σαράντα χρόνια εμπειρίας πλαισιώνονται σήμερα από μια νέα γενιά αρχιτεκτόνων. Η γνώση που έχει χτιστεί στον χρόνο συναντά νέες ιδέες και σύγχρονα εργαλεία.</p>
+          <p data-i18n="aboutP1"></p>
+          <p data-i18n="aboutP2"></p>
         </div>
       </div>
 
       <div class="team-section">
-        <h2 class="team-heading">Ομάδα</h2>
+        <h2 class="team-heading" data-i18n="team">Ομάδα</h2>
         <div class="team-grid" id="teamGrid"></div>
       </div>
     </section>
@@ -549,11 +582,11 @@
       <div class="contact-wrap">
         <h1>Contact</h1>
         <div class="contact-lines">
-          <span class="label">Email</span>
+          <span class="label" data-i18n="email">Email</span>
           <a href="mailto:info@pk-architects.gr">info@pk-architects.gr</a>
-          <span class="label">Τηλέφωνο</span>
+          <span class="label" data-i18n="phone">Τηλέφωνο</span>
           <a href="tel:+302109215456">+30 210 921 5456</a>
-          <span class="label">Διεύθυνση</span>
+          <span class="label" data-i18n="address">Διεύθυνση</span>
           <a href="https://www.google.com/maps/search/?api=1&amp;query=Monemvasias+21+Athina+11741" target="_blank" rel="noopener">Μονεμβασίας 21, Αθήνα</a>
         </div>
       </div>
@@ -580,7 +613,48 @@
   // ---- PROJECT DATA -----------------------------------------------------
   // Δοκιμαστικά δεδομένα με placeholder εικόνες. Πρόσθεσε νέα έργα
   // αντιγράφοντας ένα block μέσα στο array και βάζοντας πραγματικές φωτογραφίες.
-    // διαστάσεις κάθε εικόνας -> αποτρέπει το layout shift καθώς φορτώνουν
+    // ---- ΓΛΩΣΣΑ -----------------------------------------------------------
+  // Η σελίδα ανοίγει στα ελληνικά. Η επιλογή του επισκέπτη θυμάται τοπικά.
+  var LANG = "el";
+  try {
+    var saved = localStorage.getItem("pk-lang");
+    if (saved === "el" || saved === "en") LANG = saved;
+  } catch (e) {}
+
+  // Κείμενα διεπαφής. Ό,τι δεν είναι εδώ (μενού, tagline, ονόματα, στοιχεία
+  // επικοινωνίας) είναι κοινό και στις δύο γλώσσες.
+  var UI = {
+    projects:   { el: "Projects",        en: "Projects" },
+    count:      { el: " έργα",           en: " projects" },
+    countOne:   { el: " έργο",           en: " project" },
+    backToAll:  { el: "← Όλα τα έργα",   en: "← All projects" },
+    team:       { el: "Ομάδα",           en: "Team" },
+    category:   { el: "Κατηγορία",       en: "Category" },
+    year:       { el: "Έτος",            en: "Year" },
+    location:   { el: "Τοποθεσία",       en: "Location" },
+    status:     { el: "Κατάσταση",       en: "Status" },
+    aboutTitle: { el: "About us",        en: "About us" },
+    email:      { el: "Email",           en: "Email" },
+    phone:      { el: "Τηλέφωνο",        en: "Phone" },
+    address:    { el: "Διεύθυνση",       en: "Address" },
+    aboutP1: {
+      el: "Το αρχιτεκτονικό γραφείο πκ ιδρύθηκε το 1983 από τον Γιώργο Παπαγεωργίου και τη Λουκία Καρόρη. Ασχολείται με ιδιωτικά έργα — κατοικίες, καταστήματα, γραφεία, ξενώνες — αναλαμβάνοντας τη μελέτη, την επίβλεψη και την κατασκευή.",
+      en: "The architectural practice pk architects was founded in 1983 by Giorgos Papageorgiou and Loukia Karori. It works on private projects — houses, shops, offices and guesthouses — undertaking design, supervision and construction."
+    },
+    aboutP2: {
+      el: "Σαράντα χρόνια εμπειρίας πλαισιώνονται σήμερα από μια νέα γενιά αρχιτεκτόνων. Η γνώση που έχει χτιστεί στον χρόνο συναντά νέες ιδέες και σύγχρονα εργαλεία.",
+      en: "Forty years of experience are today complemented by a new generation of architects. Knowledge built over time meets new ideas and contemporary tools."
+    }
+  };
+
+  // t(x) -> επιστρέφει το κείμενο στην τρέχουσα γλώσσα.
+  // Δέχεται είτε {el,en} είτε σκέτο string (κοινό και στις δύο).
+  function t(x){
+    if (x && typeof x === "object" && !Array.isArray(x)) return x[LANG];
+    return x;
+  }
+
+  // διαστάσεις κάθε εικόνας -> αποτρέπει το layout shift καθώς φορτώνουν
   var IMG_DIMS = {"images/andros-01.webp": [1600, 1199], "images/andros-02.webp": [1600, 1200], "images/andros-03.webp": [1600, 1218], "images/andros-04.webp": [1200, 1600], "images/andros-05.webp": [1600, 1200], "images/andros-06.webp": [1200, 1600], "images/glyfada-01.webp": [1200, 1600], "images/paros-01.webp": [1200, 900], "images/paros-02.webp": [1200, 900], "images/paros-03.webp": [1600, 1199], "images/paros-04.webp": [1600, 1077], "images/paros-05.webp": [1600, 1200], "images/placeholder.webp": [1200, 900]};
 
   // ---- ΕΙΚΟΝΕΣ (κάθε φωτογραφία αποθηκεύεται ΜΙΑ φορά και επαναχρησιμοποιείται) ----
@@ -601,42 +675,61 @@
 var PROJECTS = [
     {
       slug: "trioroph-ano-glyfada",
-      title: "Τριώροφη κατοικία στην Άνω Γλυφάδα",
-      category: "Κατοικία",
+      title: { el: "Τριώροφη κατοικία στην Άνω Γλυφάδα",
+               en: "Three-storey residence in Ano Glyfada" },
+      category: { el: "Κατοικία", en: "Residence" },
       year: "2025",
-      location: "Άνω Γλυφάδα, Αττική",
-      status: "Ολοκληρωμένο",
-      description: [
-        "Τριώροφη κατοικία στην Άνω Γλυφάδα, σχεδιασμένη ως δύο ανεξάρτητες μεζονέτες. Το οικόπεδο βρίσκεται σε υψόμετρο στον λόφο, με απρόσκοπτη θέα προς τον Σαρωνικό — δεδομένο που καθόρισε τον προσανατολισμό των όψεων και την κατανομή των ανοιγμάτων σε κάθε επίπεδο.",
-        "Η κάθε μεζονέτα αναπτύσσεται σε δυο επίπεδα, με τους κύριους χώρους διαβίωσης τοποθετημένους στην νότια όψη ώστε να εκμεταλλεύονται πλήρως τη θέα. Ο σχεδιασμός δίνει έμφαση στη σχέση εσωτερικού–εξωτερικού χώρου, με βεράντες και υπαίθριους χώρους να λειτουργούν ως προέκταση των εσωτερικών δωματίων."
-      ],
+      location: { el: "Άνω Γλυφάδα, Αττική", en: "Ano Glyfada, Attica" },
+      status: { el: "Ολοκληρωμένο", en: "Completed" },
+      description: {
+        el: [
+          "Τριώροφη κατοικία στην Άνω Γλυφάδα, σχεδιασμένη ως δύο ανεξάρτητες μεζονέτες. Το οικόπεδο βρίσκεται σε υψόμετρο στον λόφο, με απρόσκοπτη θέα προς τον Σαρωνικό — δεδομένο που καθόρισε τον προσανατολισμό των όψεων και την κατανομή των ανοιγμάτων σε κάθε επίπεδο.",
+          "Η κάθε μεζονέτα αναπτύσσεται σε δυο επίπεδα, με τους κύριους χώρους διαβίωσης τοποθετημένους στην νότια όψη ώστε να εκμεταλλεύονται πλήρως τη θέα. Ο σχεδιασμός δίνει έμφαση στη σχέση εσωτερικού–εξωτερικού χώρου, με βεράντες και υπαίθριους χώρους να λειτουργούν ως προέκταση των εσωτερικών δωματίων."
+        ],
+        en: [
+          "Three-storey residence in Ano Glyfada, designed as two independent maisonettes. The plot sits high on the hill with an unobstructed view of the Saronic Gulf — a condition that determined the orientation of the elevations and the distribution of openings on each level.",
+          "Each maisonette develops over two levels, with the main living spaces placed on the south elevation to take full advantage of the view. The design emphasises the relationship between interior and exterior, with terraces and outdoor areas acting as extensions of the rooms."
+        ]
+      },
       cover: IMG_GLYFADA_01,
       gallery: [IMG_GLYFADA_01, IMG_BLANK]
     },
     {
       slug: "monokatoikia-paros",
-      title: "Κατοικία στην Πάρο",
-      category: "Κατοικία",
+      title: { el: "Κατοικία στην Πάρο", en: "Residence in Paros" },
+      category: { el: "Κατοικία", en: "Residence" },
       year: "2024",
-      location: "Πάρος, Κυκλάδες",
-      status: "Ολοκληρωμένο",
-      description: [
-        "Η διώροφη κατοικία οργανώνεται γύρω από τον εξωτερικό χώρο, με έναν πέτρινο τοίχο να λειτουργεί ως προστασία από τον άνεμο και να ορίζει ένα προστατευμένο περιβάλλον δίπλα στην πισίνα."
-      ],
+      location: { el: "Πάρος, Κυκλάδες", en: "Paros, Cyclades" },
+      status: { el: "Ολοκληρωμένο", en: "Completed" },
+      description: {
+        el: [
+          "Η διώροφη κατοικία οργανώνεται γύρω από τον εξωτερικό χώρο, με έναν πέτρινο τοίχο να λειτουργεί ως προστασία από τον άνεμο και να ορίζει ένα προστατευμένο περιβάλλον δίπλα στην πισίνα."
+        ],
+        en: [
+          "The two-storey residence is organised around its outdoor space, with a stone wall acting as protection from the wind and defining a sheltered environment beside the pool."
+        ]
+      },
       cover: IMG_PAROS_01,
       gallery: [IMG_PAROS_01, IMG_PAROS_03, IMG_PAROS_04, IMG_PAROS_02, IMG_PAROS_05]
     },
     {
       slug: "duo-katoikies-andros",
-      title: "Δύο εξοχικές κατοικίες στην Άνδρο",
-      category: "Κατοικία",
+      title: { el: "Δύο εξοχικές κατοικίες στην Άνδρο",
+               en: "Two holiday houses in Andros" },
+      category: { el: "Κατοικία", en: "Residence" },
       year: "2012",
-      location: "Νημποριό, Άνδρος",
-      status: "Ολοκληρωμένο",
-      description: [
-        "Δύο εξοχικές κατοικίες στο Νημποριό της Άνδρου. Τα κτίσματα τοποθετούνται κλιμακωτά στην πλαγιά, με τους λευκούς όγκους να πατούν σε τοίχους από ντόπια πέτρα που στηρίζουν το έδαφος και ορίζουν τα επίπεδα του οικοπέδου.",
-        "Ο σχεδιασμός ακολουθεί το τοπικό λεξιλόγιο — καμάρες, εξωτερικές σκάλες, χτιστά καθιστικά και τζάκι — με τα ανοίγματα στραμμένα ώστε κάθε κατοικία να κρατά τη δική της ιδιωτικότητα."
-      ],
+      location: { el: "Νημποριό, Άνδρος", en: "Nimborio, Andros" },
+      status: { el: "Ολοκληρωμένο", en: "Completed" },
+      description: {
+        el: [
+          "Δύο εξοχικές κατοικίες στο Νημποριό της Άνδρου. Τα κτίσματα τοποθετούνται κλιμακωτά στην πλαγιά, με τους λευκούς όγκους να πατούν σε τοίχους από ντόπια πέτρα που στηρίζουν το έδαφος και ορίζουν τα επίπεδα του οικοπέδου.",
+          "Ο σχεδιασμός ακολουθεί το τοπικό λεξιλόγιο — καμάρες, εξωτερικές σκάλες, χτιστά καθιστικά και τζάκι — με τα ανοίγματα στραμμένα ώστε κάθε κατοικία να κρατά τη δική της ιδιωτικότητα."
+        ],
+        en: [
+          "Two holiday houses in Nimborio, Andros. The buildings are set in tiers along the slope, their white volumes resting on local stone walls that retain the ground and define the levels of the plot.",
+          "The design follows the local vocabulary — arches, external staircases, built-in seating and fireplaces — with openings oriented so that each house retains its own privacy."
+        ]
+      },
       cover: IMG_ANDROS_01,
       gallery: [IMG_ANDROS_01, IMG_ANDROS_02, IMG_ANDROS_03, IMG_ANDROS_05, IMG_ANDROS_04, IMG_ANDROS_06]
     }
@@ -647,9 +740,15 @@ var PROJECTS = [
   // ---- TEAM DATA ---------------------------------------------------------
   // Βάλε photo: "data:image/..." όταν έχεις τις πραγματικές φωτογραφίες.
   var TEAM = [
-    { name: "Παπαγεωργίου Γιώργος", role: "Αρχιτέκτων Μηχανικός (ΕΜΠ)", photo: null },
-    { name: "Παπαγεωργίου Μάρα", role: "Αρχιτέκτων Μηχανικός (Πολυτεχνείο Κρήτης)", photo: null },
-    { name: "Παπαγεωργίου Δημήτρης", role: "Αρχιτέκτων Μηχανικός (Πολυτεχνείο Κρήτης)", photo: null }
+    { name: { el: "Παπαγεωργίου Γιώργος", en: "Giorgos Papageorgiou" },
+      role: { el: "Αρχιτέκτων Μηχανικός (ΕΜΠ)",
+              en: "Architectural Engineer (NTUA)" }, photo: null },
+    { name: { el: "Παπαγεωργίου Μάρα", en: "Mara Papageorgiou" },
+      role: { el: "Αρχιτέκτων Μηχανικός (Πολυτεχνείο Κρήτης)",
+              en: "Architectural Engineer (Technical University of Crete)" }, photo: null },
+    { name: { el: "Παπαγεωργίου Δημήτρης", en: "Dimitris Papageorgiou" },
+      role: { el: "Αρχιτέκτων Μηχανικός (Πολυτεχνείο Κρήτης)",
+              en: "Architectural Engineer (Technical University of Crete)" }, photo: null }
   ];
 
   // (το year element αφαιρέθηκε μαζί με το copyright footer)
@@ -726,19 +825,28 @@ var PROJECTS = [
   // ---- render project grid ----------------------------------------------
   var grid = document.getElementById("projectGrid");
   var countEl = document.getElementById("projCount");
-  countEl.textContent = PROJECTS.length + " έργα";
 
-  PROJECTS.forEach(function(p){
-    var card = document.createElement("div");
-    card.className = "project-card";
-    card.innerHTML =
-      '<a href="#/projects/' + p.slug + '">' +
-        '<img src="' + p.cover + '" alt="' + p.title + '" loading="lazy">' +
-        '<div class="card-meta"><div class="t">' + p.title + '</div>' +
-        '<div class="m">' + p.category + ' — ' + p.year + '</div></div>' +
-      '</a>';
-    grid.appendChild(card);
-  });
+  function renderGrid(){
+    grid.innerHTML = "";
+    countEl.textContent = PROJECTS.length +
+      t(PROJECTS.length === 1 ? UI.countOne : UI.count);
+    PROJECTS.forEach(function(p){
+      var card = document.createElement("div");
+      card.className = "project-card";
+      var title = t(p.title);
+      card.innerHTML =
+        '<a href="#/projects/' + p.slug + '">' +
+          '<img src="' + p.cover + '" alt="" loading="lazy">' +
+          '<div class="card-meta"><div class="t"></div>' +
+          '<div class="m"></div></div>' +
+        '</a>';
+      // τα κείμενα μπαίνουν ως textContent -> δεν σπάνε αν περιέχουν σύμβολα
+      card.querySelector("img").alt = title;
+      card.querySelector(".card-meta .t").textContent = title;
+      card.querySelector(".card-meta .m").textContent = t(p.category) + " — " + p.year;
+      grid.appendChild(card);
+    });
+  }
 
   // Οι κενές θέσεις "Επόμενο έργο" αφαιρέθηκαν — το grid δείχνει μόνο
   // τα πραγματικά projects. Αν θες να τις ξαναβάλεις, βγάλε το σχόλιο εδώ:
@@ -751,27 +859,44 @@ var PROJECTS = [
 
   // ---- render team --------------------------------------------------------
   var teamGrid = document.getElementById("teamGrid");
-  TEAM.forEach(function(m){
-    var card = document.createElement("div");
-    card.className = "team-card";
-    card.innerHTML =
-      '<div class="team-name">' + m.name + '</div>' +
-      '<div class="team-role">' + m.role + '</div>';
-    teamGrid.appendChild(card);
-  });
+  function renderTeam(){
+    teamGrid.innerHTML = "";
+    TEAM.forEach(function(m){
+      var card = document.createElement("div");
+      card.className = "team-card";
+      var n = document.createElement("div");
+      n.className = "team-name"; n.textContent = t(m.name);
+      var r = document.createElement("div");
+      r.className = "team-role"; r.textContent = t(m.role);
+      card.appendChild(n); card.appendChild(r);
+      teamGrid.appendChild(card);
+    });
+  }
 
   // ---- project detail render ---------------------------------------------
   function renderProject(slug){
     var p = PROJECTS.filter(function(x){ return x.slug === slug; })[0];
     if (!p){ location.hash = "#/projects"; return; }
-    document.getElementById("pTitle").textContent = p.title;
-    var descArr = Array.isArray(p.description) ? p.description : [p.description];
-    document.getElementById("pDesc").innerHTML = descArr.map(function(t){ return "<p>" + t + "</p>"; }).join("");
-    document.getElementById("pFacts").innerHTML =
-      "<dt>Κατηγορία</dt><dd>" + p.category + "</dd>" +
-      "<dt>Έτος</dt><dd>" + p.year + "</dd>" +
-      "<dt>Τοποθεσία</dt><dd>" + p.location + "</dd>" +
-      "<dt>Κατάσταση</dt><dd>" + p.status + "</dd>";
+    document.getElementById("pTitle").textContent = t(p.title);
+
+    var descArr = t(p.description);
+    if (!Array.isArray(descArr)) descArr = [descArr];
+    var descEl = document.getElementById("pDesc");
+    descEl.innerHTML = "";
+    descArr.forEach(function(txt){
+      var para = document.createElement("p");
+      para.textContent = txt;
+      descEl.appendChild(para);
+    });
+
+    var facts = document.getElementById("pFacts");
+    facts.innerHTML = "";
+    [[UI.category, t(p.category)], [UI.year, p.year],
+     [UI.location, t(p.location)], [UI.status, t(p.status)]].forEach(function(pair){
+      var dt = document.createElement("dt"); dt.textContent = t(pair[0]);
+      var dd = document.createElement("dd"); dd.textContent = pair[1];
+      facts.appendChild(dt); facts.appendChild(dd);
+    });
     var gal = document.getElementById("pGallery");
     gal.innerHTML = "";
     p.gallery.forEach(function(src, i){
@@ -837,6 +962,43 @@ var PROJECTS = [
     else if (e.key === "ArrowLeft") lbStep(-1);
     else if (e.key === "ArrowRight") lbStep(1);
   });
+
+  // ---- εφαρμογή γλώσσας ---------------------------------------------------
+  function applyLang(){
+    document.documentElement.lang = LANG;
+
+    // στατικά κείμενα με data-i18n
+    document.querySelectorAll("[data-i18n]").forEach(function(el){
+      var key = el.getAttribute("data-i18n");
+      if (UI[key]) el.textContent = t(UI[key]);
+    });
+
+    // δυναμικά τμήματα
+    renderGrid();
+    renderTeam();
+
+    // αν βρισκόμαστε σε σελίδα έργου, ξαναγράψε την στη νέα γλώσσα
+    var parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+    if (parts[0] === "projects" && parts.length === 2) renderProject(parts[1]);
+
+    // ενεργό κουμπί
+    document.querySelectorAll(".lang-switch button").forEach(function(b){
+      b.classList.toggle("active", b.dataset.lang === LANG);
+    });
+  }
+
+  function setLang(next){
+    if (next === LANG) return;
+    LANG = next;
+    try { localStorage.setItem("pk-lang", LANG); } catch (e) {}
+    applyLang();
+  }
+
+  document.querySelectorAll(".lang-switch button").forEach(function(b){
+    b.addEventListener("click", function(){ setLang(b.dataset.lang); });
+  });
+
+  applyLang();
 
   // ---- mobile nav toggle ----------------------------------------------------
   var toggle = document.getElementById("menuToggle");
