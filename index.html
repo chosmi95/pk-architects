@@ -179,9 +179,13 @@
     cursor:pointer;
   }
   .hero-image{
+    position:absolute;
+    top:0; left:0;
     width:100%; height:100%; object-fit:cover;
     opacity:0;
-    transition:opacity 1s ease;
+    /* το πέρασμα: αργό και ομαλό, ίδιο με τον χρόνο στο JS (HERO_FADE_MS) */
+    transition:opacity 1.2s cubic-bezier(.4,0,.2,1);
+    will-change:opacity;
   }
   .hero-image.visible{opacity:1;}
   .hero-nav{
@@ -527,7 +531,8 @@
       <div class="hero">
         <div class="hero-stage">
           <a class="hero-image-wrap" id="heroLink" href="#/projects">
-            <img id="heroImage" class="hero-image" src="" alt="">
+            <img class="hero-image visible" data-layer="a" src="" alt="">
+            <img class="hero-image" data-layer="b" src="" alt="">
           </a>
           <button class="hero-nav hero-prev" id="heroPrev" aria-label="Προηγούμενη φωτογραφία">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg>
@@ -756,15 +761,20 @@ var PROJECTS = [
   // ---- home hero: rotating image --------------------------------------
   var heroStart = function(){}, heroStop = function(){};   // γεμίζουν παρακάτω
   (function(){
-    var heroImg = document.getElementById("heroImage");
+    var layers = document.querySelectorAll(".hero-image");
+    var front = 0;                 // ποιο layer φαίνεται τώρα
+    var HERO_FADE_MS = 1200;       // πρέπει να ταιριάζει με το CSS transition
+    var HERO_HOLD_MS = 5000;       // πόσο μένει κάθε φωτογραφία
     var heroLink = document.getElementById("heroLink");
-    // Λευκή/κενή placeholder εικόνα -- εξαιρείται από το carousel της Home
-    var BLANK_PLACEHOLDER = "data:image/webp;base64,UklGRs4HAABXRUJQVlA4IMIHAAAw6QCdASqwBIQDPm02mUmkIyKhIAgAgA2JaW7hd2EbQAnsA99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99snIe+2TkPfbJyHvtk5D32ych77ZOQ99YAD+/+jQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    // Η λευκή/κενή placeholder εικόνα εξαιρείται από το carousel.
+    // Ελέγχουμε με το ίδιο το IMG_BLANK ώστε να ισχύει είτε είναι αρχείο
+    // είτε ενσωματωμένο data URI.
+    function isBlank(src){ return src === IMG_BLANK; }
     var heroImages = [];
     PROJECTS.forEach(function(p){
-      if (p.cover && p.cover !== BLANK_PLACEHOLDER) heroImages.push({ src: p.cover, slug: p.slug });
+      if (p.cover && !isBlank(p.cover)) heroImages.push({ src: p.cover, slug: p.slug });
       (p.gallery || []).forEach(function(src){
-        if (src === BLANK_PLACEHOLDER) return;
+        if (isBlank(src)) return;
         if (!heroImages.some(function(h){ return h.src === src; })){
           heroImages.push({ src: src, slug: p.slug });
         }
@@ -772,15 +782,43 @@ var PROJECTS = [
     });
     if (heroImages.length === 0){ return; }
     var idx = 0;
-    function showHero(i){
-      heroImg.classList.remove("visible");
-      window.setTimeout(function(){
-        heroImg.src = heroImages[i].src;
-        heroImg.classList.add("visible");
-        heroLink.href = "#/projects/" + heroImages[i].slug;
-      }, 250);
+    var busy = false;   // αποτρέπει επικαλυπτόμενα περάσματα
+
+    // Δείχνει την πρώτη εικόνα χωρίς πέρασμα.
+    layers[front].src = heroImages[0].src;
+    heroLink.href = "#/projects/" + heroImages[0].slug;
+
+    // Κατεβάζει την εικόνα ΠΡΙΝ ξεκινήσει το πέρασμα, ώστε να μη
+    // μεσολαβεί ποτέ κενό. Αν αργήσει, μένει η προηγούμενη.
+    function preload(src){
+      return new Promise(function(resolve){
+        var im = new Image();
+        im.onload = im.onerror = function(){ resolve(); };
+        im.src = src;
+        if (im.complete) resolve();   // ήδη στην cache
+      });
     }
-    showHero(idx);
+
+    function showHero(i){
+      if (busy) return;
+      var item = heroImages[i];
+      var back = 1 - front;
+      busy = true;
+
+      preload(item.src).then(function(){
+        layers[back].src = item.src;
+        // ένα frame ώστε ο browser να καταγράψει το νέο src πριν το fade
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){
+            layers[back].classList.add("visible");
+            layers[front].classList.remove("visible");
+            heroLink.href = "#/projects/" + item.slug;
+            front = back;
+            window.setTimeout(function(){ busy = false; }, HERO_FADE_MS);
+          });
+        });
+      });
+    }
 
     var autoTimer = null;
     function startAuto(){
@@ -789,7 +827,7 @@ var PROJECTS = [
       autoTimer = window.setInterval(function(){
         idx = (idx + 1) % heroImages.length;
         showHero(idx);
-      }, 4500);
+      }, HERO_HOLD_MS);
     }
     function stopAuto(){
       if (autoTimer){ window.clearInterval(autoTimer); autoTimer = null; }
